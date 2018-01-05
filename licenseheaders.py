@@ -216,7 +216,7 @@ def for_type(templatelines,type):
             tmp = headerLinePrefix + tmp
         if headerLineSuffix is not None:
             tmp = tmp + headerLineSuffix
-        lines.append(tmp.rstrip())
+        lines.append(tmp.rstrip() + "\n")
     if headerEndLine is not None:
         lines.append(headerEndLine)
     return lines

@@ -264,7 +264,7 @@ def read_file(file):
             headStart = i
             break
         elif lineCommentStartPattern and lineCommentStartPattern.findall(line):
-            pass
+            return None
         elif not blockCommentStartPattern and lineCommentStartPattern and lineCommentStartPattern.findall(line):
             headStart = i
             break

@@ -175,6 +175,8 @@ def parse_command_line(argv):
                         help="Name of project to use.")
     parser.add_argument("-u", "--projurl", dest="projecturl", nargs=1,
                         help="Url of project to use.")
+    parser.add_argument("-e", "--exclude", dest="exclude", nargs='+', default=[],
+                        help="A directory to exclude")
     arguments = parser.parse_args(argv[1:])
 
     # Sets log level to WARN going more verbose for each new -V.
@@ -182,15 +184,17 @@ def parse_command_line(argv):
     return arguments
 
 
-def get_paths(patterns, start_dir="."):
+def get_paths(patterns, start_dir=".", excludes=[]):
     """Retrieve files that match any of the glob patterns from the start_dir and below."""
     for root, dirs, files in os.walk(start_dir):
         names = []
+
         for pattern in patterns:
             names += fnmatch.filter(files, pattern)
         for name in names:
-            path = os.path.join(root, name)
-            yield path
+            path = os.path.abspath(os.path.join(root, name))
+            if not any([path.startswith(os.path.abspath(x)) for x in excludes]):
+                yield path
 
 # return an array of lines, with all the variables replaced
 # throws an error if a variable cannot be replaced
@@ -378,7 +382,7 @@ def main():
             ## now process all the files and either replace the years or replace/add the header
             logging.debug("Processing directory %s",start_dir)
             logging.debug("Patterns: %s",patterns)
-            for file in get_paths(patterns,start_dir):
+            for file in get_paths(patterns,start_dir, arguments.exclude):
                 logging.debug("Processing file: %s",file)
                 dict = read_file(file)
                 if not dict:
